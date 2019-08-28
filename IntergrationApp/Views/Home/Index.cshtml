@@ -1,0 +1,86 @@
+﻿@{
+    ViewBag.Title = "medEbridge Market Place Single Sign-On";
+}
+
+<div class="jumbotron">
+    <h1>medEbridge Market Place Single Sign-On</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        @Html.Label("medEbridge OAuth Server Url")
+        @Html.TextBox("oAuthServerUrl", "https://it0882.uhg.com.au/UHG.medEbridge2.WebApi/OAuth2/Token", new { @class = "form-control" })
+    </div>
+    <div class="col-md-4">
+        <input type="button" onclick="getTokenFromAuth();" value="Get OAuth Token" id="Gettoken" class="form-control" />
+        @Html.TextBox("tokenValue", null, new { @class = "form-control"})
+    </div>
+    <div class="col-md-4">
+        @Html.Label("User Id")
+        @Html.TextBox("UserId", "A54B01F2-01CB-43A5-92F5-001345DD3D55", new { @class = "form-control" })
+    </div>
+    @*<div class="col-md-4">
+        @Html.Label("Password")
+        @Html.TextBox("UserPassword","Test_313", new { @class = "form-control", placeholder = "Password", @type = "password" })
+    </div>*@
+    <div class="col-md-4">
+        @Html.Label("medEbridge Url")
+        @Html.TextBox("medEbridgeUrl", "https://medebridge2-local.uhg.com.au/Account/SignInWithToken", new { @class = "form-control" })
+    </div>
+    <div class="col-md-4">
+        @Html.Label("medEbridge Url Path")
+        @Html.TextBox("medEbridgePath", "OrderV2/CreateOrder", new { @class = "form-control" })
+    </div>
+    <div class="col-md-4">
+        <input type="button" value="Place an order" id="loadMedEbridge" name='button' class="form-control" />
+    </div>
+
+</div>
+
+<iframe height="700" width="1200" id="receiver" src="https://medebridge2-local.uhg.com.au/Account/SignInWithToken">
+    
+</iframe>
+<script type="text/javascript">
+
+    window.onload = function () {
+        // Get the window displayed in the iframe.
+        var receiver = document.getElementById('receiver').contentWindow;
+
+        // Get a reference to the 'Send Message' button.
+        var btn = document.getElementById('loadMedEbridge');
+        var userId = $('#UserId').val();
+        // A function to handle sending messages.
+        function sendMessage(e) {
+            // Prevent any default browser behaviour.
+            e.preventDefault();
+
+            receiver.postMessage(userId + "|" + $('#tokenValue').val(), 'https://medebridge2-local.uhg.com.au');
+        }
+
+        // Add an event listener that will execute the sendMessage() function
+        // when the send button is clicked.
+        btn.addEventListener('click', sendMessage);
+    }
+
+    function getTokenFromAuth() {
+        var url = $('#oAuthServerUrl').val();
+        $.ajax({
+            url: url,
+            type: 'POST',
+            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+            data: {
+                "client_id": "a8137de3-ae51-498f-956d-4b90058da383",
+                "client_secret": "qukUia1y30OjSCZcvfM2ZQ",
+                "grant_type": "client_credentials"
+            },
+            success: function (data) {
+                if (data) {
+                    $('#tokenValue').val(data.access_token);
+                }
+            }
+        });
+    }
+   
+  
+   
+</script>
